@@ -3,10 +3,10 @@ import logging
 import time
 import json
 import gzip
-import requests
 import datetime
 from urllib.parse import urlparse
 import random
+import cloudscraper
 
 logging.basicConfig(
     filename='app.log', 
@@ -18,20 +18,16 @@ post_prefix = 'posts'
 post_like_minimum = 2000
 threshold_percentage = 6
 
+# headers = {
+#     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0",
+#     "Accept": "*/*",
+#     "Accept-Encoding": "gzip, deflate, br",
+#     "Connection": "keep-alive",
+#     "Referer": "https://example.com",
+#     "Origin": "https://example.com",
+# }
 
-userAgents = [
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/119.0",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
-]
 
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0",
-    "Accept": "*/*",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Connection": "keep-alive",
-}
 
 def count_posts(payload):
     try:
@@ -43,9 +39,8 @@ def count_posts(payload):
     return posts
 
 def progress_posts(url):
-    # This fails; returns <Response [403]>
-    response = requests.get(url, headers=headers)
-    # Some more code here...
+    scraper = cloudscraper.create_scraper()
+    response = scraper.get(url)
     total_posts = 0
     status_code = response.status_code
     payload = response.json().get('data')
@@ -77,7 +72,7 @@ def progress_posts(url):
                     get_comments_from_http(post_id, comment_threshold, directory_path+'/'+post_id)
 
 
-            response = requests.get(next_url, headers=headers)
+            response = scraper.get(next_url)
             payload = response.json().get('data')
             amount_of_posts = count_posts(payload)
             total_posts += amount_of_posts
