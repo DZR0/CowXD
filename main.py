@@ -1,4 +1,3 @@
-from jenkins_old_farm import JenkinsWife, JenkinsJr
 import logging
 from utils import *
 
@@ -20,3 +19,4 @@ def main():
     print('Done!')
     
 main()
+
