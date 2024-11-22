@@ -28,6 +28,7 @@ threshold_percentage = 6
 # }
 
 
+scraper = cloudscraper.create_scraper()
 
 def count_posts(payload):
     try:
@@ -39,7 +40,6 @@ def count_posts(payload):
     return posts
 
 def progress_posts(url):
-    scraper = cloudscraper.create_scraper()
     response = scraper.get(url)
     total_posts = 0
     status_code = response.status_code
@@ -107,7 +107,7 @@ def download_file(url, output_path):
             print(f"File already exists: {output_path}")
             return
 
-        response = requests.get(url)
+        response = scraper.get(url)
         
         if response.status_code == 200:
             parsed = urlparse(url)
@@ -129,7 +129,7 @@ def download_file(url, output_path):
 def get_comments_from_http(post_id, comment_like_threshold, parent_directory):
     logging.info("get_comments_from_http()")
     request_address = f'https://comment-cdn.9gag.com/v2/cacheable/comment-list.json?appId=a_dd8f2b7d304a10edaf6f29517ea0ca4100a43d1b&count=100&type=hot&viewMode=list&postKey={post_id}&url=http://9gag.com/gag/{post_id}&origin=https://9gag.com'
-    response = requests.get(url=request_address).json()
+    response = scraper.get(url=request_address).json()
     
     max_iterations = 100
     iterations = 0
